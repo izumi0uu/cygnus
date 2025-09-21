@@ -1,2 +1,6 @@
-cygnus
-cygnus.pub
+node_modules
+.env
+
+.cursorindexingignore
+
+.specstory
