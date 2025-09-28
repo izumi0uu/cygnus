@@ -1,16 +1,31 @@
 {
-  "name": "cygnus",
+  "name": "cygnus-arbitrage-bot",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
+    "start": "node main.js",
+    "dev": "nodemon main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "aptos",
+    "arbitrage",
+    "defi",
+    "trading",
+    "bot",
+    "kana-labs"
+  ],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Aptos Arbitrage Bot - Based on Kana Labs Aggregator",
   "dependencies": {
     "@aptos-labs/ts-sdk": "^5.0.0",
-    "dotenv": "^17.2.2"
+    "@kanalabs/aggregator": "^0.7.14-beta.14",
+    "dotenv": "^17.2.2",
+    "node-cron": "^3.0.3",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   }
 }
