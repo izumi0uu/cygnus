@@ -9,7 +9,7 @@ import { getMetadata } from "~~/utils/scaffold-eth/getMetadata";
 
 export const metadata = getMetadata({
   title: "Workflows defi App",
-  description: "workflows",
+  description: "workflows Application",
 });
 
 const ScaffoldEthApp = ({ children }: { children: ReactNode }) => {
