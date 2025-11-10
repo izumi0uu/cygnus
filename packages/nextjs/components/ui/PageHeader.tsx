@@ -20,7 +20,6 @@ export type PageHeaderProps = {
 export default function PageHeader({
   autoBreadcrumbs = false,
   breadcrumbs: breadcrumbsProp,
-  title,
   leftSlot,
   rightSlot,
   className,
@@ -28,17 +27,11 @@ export default function PageHeader({
 }: PageHeaderProps) {
   const pathname = usePathname();
 
-  const { breadcrumbs: autoBreadcrumbsValue, pageTitle } = React.useMemo(
-    () => buildBreadcrumbs(pathname ?? "/"),
-    [pathname],
-  );
+  const { breadcrumbs: autoBreadcrumbsValue } = React.useMemo(() => buildBreadcrumbs(pathname ?? "/"), [pathname]);
 
   const breadcrumbs = breadcrumbsProp ?? (autoBreadcrumbs ? autoBreadcrumbsValue : undefined);
-  const effectiveTitle = title ?? (autoBreadcrumbs ? pageTitle : undefined);
 
   const hasBreadcrumbs = breadcrumbs && breadcrumbs.length > 0;
-  const resolvedLeftSlot =
-    leftSlot ?? (effectiveTitle ? <h1 className="text-xl sm:text-2xl font-bold truncate">{effectiveTitle}</h1> : null);
 
   return (
     <header
@@ -72,7 +65,7 @@ export default function PageHeader({
               </ul>
             </nav>
           ) : null}
-          {resolvedLeftSlot}
+          {leftSlot}
         </div>
         <div className="flex items-center gap-3 shrink-0">{rightSlot}</div>
       </div>
