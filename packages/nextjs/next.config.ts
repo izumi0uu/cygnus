@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
   },
   webpack: config => {
     config.resolve.fallback = { fs: false, net: false, tls: false };
+    config.resolve.alias = Object.assign({}, config.resolve.alias, {
+      "clsx/dist/clsx.m.js": require.resolve("clsx"),
+      "clsx/dist/clsx.mjs": require.resolve("clsx"),
+    });
     config.externals.push("pino-pretty", "lokijs", "encoding");
     return config;
   },
