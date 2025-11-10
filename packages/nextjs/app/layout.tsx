@@ -1,9 +1,12 @@
 import type { ReactNode } from "react";
 import "@rainbow-me/rainbowkit/styles.css";
 import "@scaffold-ui/components/styles.css";
-import { ScaffoldEthAppWithProviders } from "~~/components/ScaffoldEthAppWithProviders";
-import { ThemeProvider } from "~~/components/ThemeProvider";
+import { Providers } from "~~/components/providers/Providers";
+import { Footer } from "~~/components/ui/Footer";
+import { Header } from "~~/components/ui/Header";
+import HeaderRightSlot from "~~/components/ui/HeaderRightSlot";
 import PageHeader from "~~/components/ui/PageHeader";
+import SideNav from "~~/components/ui/SideNav";
 import "~~/styles/globals.css";
 import { getMetadata } from "~~/utils/scaffold-eth/getMetadata";
 
@@ -16,14 +19,24 @@ const ScaffoldEthApp = ({ children }: { children: ReactNode }) => {
   return (
     <html suppressHydrationWarning>
       <body>
-        <ThemeProvider enableSystem>
-          <ScaffoldEthAppWithProviders>
-            <div className="min-h-screen flex flex-col">
-              <PageHeader autoBreadcrumbs />
-              <main className="flex-1">{children}</main>
+        <Providers>
+          <div className="flex flex-col min-h-screen">
+            <Header />
+            <div className="flex flex-1 bg-base-200">
+              <SideNav />
+              <div className="flex-1 flex flex-col">
+                <PageHeader
+                  autoBreadcrumbs
+                  className="border-b-0"
+                  containerClassName="max-w-none px-6 mx-0"
+                  rightSlot={<HeaderRightSlot />}
+                />
+                <main className="flex-1 overflow-y-auto px-6 py-6">{children}</main>
+              </div>
             </div>
-          </ScaffoldEthAppWithProviders>
-        </ThemeProvider>
+            <Footer />
+          </div>
+        </Providers>
       </body>
     </html>
   );
