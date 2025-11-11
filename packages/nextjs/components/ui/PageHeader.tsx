@@ -34,7 +34,10 @@ export default function PageHeader({
   const hasBreadcrumbs = breadcrumbs && breadcrumbs.length > 0;
 
   return (
-    <header className={cn("navbar bg-base-100 border-b border-base-200", "min-h-8", className)} data-slot="page-header">
+    <header
+      className={cn("navbar bg-base-100 border-b border-base-200", "min-h-16", className)}
+      data-slot="page-header"
+    >
       <div className={cn("w-full max-w-7xl mx-auto", "flex items-center justify-between gap-3", containerClassName)}>
         <div className="flex items-center gap-3 min-w-0">
           {hasBreadcrumbs ? (

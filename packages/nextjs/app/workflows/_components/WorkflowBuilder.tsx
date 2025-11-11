@@ -47,12 +47,9 @@ export default function WorkflowBuilder({ mode = "view" }: WorkflowBuilderProps)
 
   return (
     <div className="min-h-screen">
-      <div className="w-full max-w-[120rem] mx-auto px-4 sm:px-6 py-6">
-        <div className="flex items-center justify-between gap-3 mb-4">
-          <div className="flex items-center gap-2">
-            <span className="badge badge-outline capitalize">{isCreate ? "create" : mode}</span>
-          </div>
-          <div className="flex items-center gap-2">
+      <div className="w-full max-w-[120rem] mx-auto">
+        <div className="flex justify-end items-center gap-3 mb-4">
+          <div className="flex items-center gap-2 ">
             <button className="btn btn-ghost" onClick={handleReset}>
               Reset
             </button>
