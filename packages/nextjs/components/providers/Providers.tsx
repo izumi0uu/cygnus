@@ -8,6 +8,7 @@ import { useTheme } from "next-themes";
 import { Toaster } from "react-hot-toast";
 import { WagmiProvider } from "wagmi";
 import { ThemeProvider } from "~~/components/ThemeProvider";
+import { TopControlsProvider } from "~~/components/providers/TopControlsProvider";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 
@@ -37,8 +38,10 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
             avatar={BlockieAvatar}
             theme={mounted ? (isDarkMode ? darkTheme() : lightTheme()) : lightTheme()}
           >
-            {children}
-            <Toaster />
+            <TopControlsProvider>
+              {children}
+              <Toaster />
+            </TopControlsProvider>
           </RainbowKitProvider>
         </QueryClientProvider>
       </WagmiProvider>

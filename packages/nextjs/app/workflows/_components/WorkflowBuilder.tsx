@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import { SideBar } from "./SideBar";
+import { WorkflowControls } from "./WorkflowControls";
 import {
   Background,
   type Connection,
@@ -15,7 +16,7 @@ import {
   useNodesState,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { Check, Play, RotateCcw } from "lucide-react";
+import { useTopControls } from "~~/components/providers/TopControlsProvider";
 
 export type WorkflowBuilderProps = {
   mode?: "view" | "create" | "edit";
@@ -36,18 +37,31 @@ export default function WorkflowBuilder({ mode = "view" }: WorkflowBuilderProps)
   const isCreate = mode === "create";
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const { setControls, clearControls } = useTopControls();
 
-  const onConnect = React.useCallback(
-    (connection: Connection) => setEdges(eds => addEdge(connection, eds)),
-    [setEdges],
-  );
+  const onConnect = useCallback((connection: Connection) => setEdges(eds => addEdge(connection, eds)), [setEdges]);
 
-  const handleReset = React.useCallback(() => {
+  const handleReset = useCallback(() => {
     setNodes(initialNodes);
     setEdges(initialEdges);
   }, [setNodes, setEdges]);
 
-  const handleAddNode = React.useCallback(
+  const handleTest = useCallback(() => {
+    // placeholder for future simulator integration
+  }, []);
+
+  const handleSave = useCallback(() => {
+    // placeholder for future persistence integration
+  }, []);
+
+  useEffect(() => {
+    setControls(<WorkflowControls isCreate={isCreate} onTest={handleTest} onReset={handleReset} onSave={handleSave} />);
+    return () => {
+      clearControls();
+    };
+  }, [setControls, clearControls, isCreate, handleTest, handleReset, handleSave]);
+
+  const handleAddNode = useCallback(
     (kind: string) => {
       if (!isCreate) return;
       const id = `${kind}-${Date.now()}`;
@@ -75,19 +89,6 @@ export default function WorkflowBuilder({ mode = "view" }: WorkflowBuilderProps)
   return (
     <div className="min-h-screen">
       <div className="w-full max-w-[120rem] mx-auto">
-        <div className="flex justify-end items-center gap-3 mb-4">
-          <div className="flex items-center gap-2 border border-base-200 rounded-box p-2 shadow-sm">
-            <button className="btn" disabled={!isCreate}>
-              <Play className="h-4 w-4" /> Test
-            </button>
-            <button className="btn" onClick={handleReset}>
-              <RotateCcw className="h-4 w-4" /> Reset
-            </button>
-            <button className="btn btn-primary" disabled={!isCreate}>
-              <Check className="h-4 w-4" /> Save
-            </button>
-          </div>
-        </div>
         <div className="relative h-[70vh] min-h-[520px] rounded-box border border-base-200 bg-base-100 overflow-hidden">
           <div className="flex h-full">
             <SideBar onAdd={handleAddNode} />

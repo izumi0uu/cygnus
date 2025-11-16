@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { PlusCircleIcon } from "@heroicons/react/20/solid";
+import { useTopControls } from "~~/components/providers/TopControlsProvider";
 
 export default function HeaderRightSlot() {
+  const { controls } = useTopControls();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -12,11 +14,11 @@ export default function HeaderRightSlot() {
     return null;
   }
 
+  if (controls) return <>{controls}</>;
+
   if (pathname === "/workflows") {
     const mode = searchParams?.get("mode");
-    if (mode === "create") {
-      return null;
-    }
+    if (mode === "create") return null;
 
     return (
       <Link href="/workflows?mode=create" className="btn btn-primary">
