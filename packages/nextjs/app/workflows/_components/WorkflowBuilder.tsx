@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { SideBar } from "./SideBar";
 import {
   Background,
   type Connection,
@@ -14,6 +15,7 @@ import {
   useNodesState,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { Check, Play, RotateCcw } from "lucide-react";
 
 export type WorkflowBuilderProps = {
   mode?: "view" | "create" | "edit";
@@ -45,32 +47,65 @@ export default function WorkflowBuilder({ mode = "view" }: WorkflowBuilderProps)
     setEdges(initialEdges);
   }, [setNodes, setEdges]);
 
+  const handleAddNode = React.useCallback(
+    (kind: string) => {
+      if (!isCreate) return;
+      const id = `${kind}-${Date.now()}`;
+      const base = { x: 220, y: 180 };
+      const labelMap: Record<string, string> = {
+        time: "Time Trigger",
+        "webhook-trigger": "Webhook",
+        http: "HTTP Request",
+        db: "Database",
+        notify: "Notification",
+        message: "Message",
+      };
+      setNodes(ns => [
+        ...ns,
+        {
+          id,
+          position: base,
+          data: { label: labelMap[kind] ?? kind },
+        },
+      ]);
+    },
+    [isCreate, setNodes],
+  );
+
   return (
     <div className="min-h-screen">
       <div className="w-full max-w-[120rem] mx-auto">
         <div className="flex justify-end items-center gap-3 mb-4">
-          <div className="flex items-center gap-2 ">
-            <button className="btn btn-ghost" onClick={handleReset}>
-              Reset
+          <div className="flex items-center gap-2 border border-base-200 rounded-box p-2 shadow-sm">
+            <button className="btn" disabled={!isCreate}>
+              <Play className="h-4 w-4" /> Test
+            </button>
+            <button className="btn" onClick={handleReset}>
+              <RotateCcw className="h-4 w-4" /> Reset
             </button>
             <button className="btn btn-primary" disabled={!isCreate}>
-              Save
+              <Check className="h-4 w-4" /> Save
             </button>
           </div>
         </div>
         <div className="relative h-[70vh] min-h-[520px] rounded-box border border-base-200 bg-base-100 overflow-hidden">
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={isCreate ? onConnect : undefined}
-            fitView
-          >
-            <MiniMap />
-            <Controls />
-            <Background gap={16} size={1} />
-          </ReactFlow>
+          <div className="flex h-full">
+            <SideBar onAdd={handleAddNode} />
+            <div className="flex-1">
+              <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+                onConnect={isCreate ? onConnect : undefined}
+                fitView
+              >
+                <MiniMap />
+                <Controls />
+                <Background gap={16} size={1} />
+              </ReactFlow>
+            </div>
+          </div>
         </div>
       </div>
     </div>
