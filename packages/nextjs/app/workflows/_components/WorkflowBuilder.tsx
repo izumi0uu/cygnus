@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect } from "react";
+import { EmptyTipsCard } from "./EmptyTipsCard";
 import { SideBar } from "./SideBar";
 import { WorkflowControls } from "./WorkflowControls";
 import {
@@ -15,6 +16,7 @@ import {
   useEdgesState,
   useNodesState,
 } from "@xyflow/react";
+import { Panel } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useTopControls } from "~~/components/providers/TopControlsProvider";
 
@@ -22,16 +24,9 @@ export type WorkflowBuilderProps = {
   mode?: "view" | "create" | "edit";
 };
 
-const initialNodes: Node[] = [
-  { id: "start", position: { x: 150, y: 120 }, data: { label: "Start" }, type: "input" },
-  { id: "task-1", position: { x: 420, y: 120 }, data: { label: "Task" } },
-  { id: "end", position: { x: 700, y: 120 }, data: { label: "End" }, type: "output" },
-];
+const initialNodes: Node[] = [];
 
-const initialEdges: Edge[] = [
-  { id: "e1", source: "start", target: "task-1" },
-  { id: "e2", source: "task-1", target: "end" },
-];
+const initialEdges: Edge[] = [];
 
 export default function WorkflowBuilder({ mode = "view" }: WorkflowBuilderProps) {
   const isCreate = mode === "create";
@@ -104,6 +99,11 @@ export default function WorkflowBuilder({ mode = "view" }: WorkflowBuilderProps)
                 <MiniMap />
                 <Controls />
                 <Background gap={16} size={1} />
+                {nodes.length === 0 && edges.length === 0 && (
+                  <Panel position="top-left" className="w-full pointer-events-none">
+                    <EmptyTipsCard />
+                  </Panel>
+                )}
               </ReactFlow>
             </div>
           </div>
