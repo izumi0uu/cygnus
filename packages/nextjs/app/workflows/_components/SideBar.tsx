@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import TimeTriggerNode from "./nodes/TimeTriggerNode";
-import { Bell, Clock, Database, MessageSquareText, Webhook, Zap } from "lucide-react";
+import { Bell, Clock, Crosshair, Database, MessageSquareText, Webhook, Zap } from "lucide-react";
 
 type NodePaletteItem = {
   kind: string;
@@ -44,7 +43,7 @@ export const SideBar = ({ onAdd }: SideBarProps) => {
   const filteredActions = actionItems.filter(i => i.label.toLowerCase().includes(q) || i.kind.includes(q));
 
   return (
-    <aside className="bg-base-200 border-r border-base-300 p-4 flex-shrink-0 space-y-3">
+    <aside className="bg-base-200 border-r border-base-300 p-4 flex-shrink-0 space-y-3 w-[280px]">
       <input
         value={query}
         onChange={e => setQuery(e.target.value)}
@@ -53,23 +52,27 @@ export const SideBar = ({ onAdd }: SideBarProps) => {
       />
 
       <details open className="collapse collapse-arrow bg-base-100 border border-base-300 rounded-box">
-        <summary className="collapse-title text-sm font-semibold flex items-center gap-2">
-          Triggers
-          <span className="badge badge-sm">{filteredTriggers.length}</span>
+        <summary className="collapse-title text-base font-semibold flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            <Zap className="h-4 w-4" />
+            Triggers
+            <span className="badge badge-sm">{filteredTriggers.length}</span>
+          </div>
         </summary>
         <div className="collapse-content">
-          <ul className="menu gap-1">
+          <ul className="menu gap-2 w-full">
             {filteredTriggers.map(item => (
               <li key={item.kind}>
-                <button className="btn btn-ghost btn-sm justify-start" onClick={() => onAdd?.(item.kind)}>
-                  {item.icon}
-                  <span className="font-medium">{item.label}</span>
-                </button>
-                {item.kind === "time" && (
-                  <div className="px-2 pb-3">
-                    <TimeTriggerNode preview data={{ label: "Time Trigger", status: "default", time: "10:00" }} />
+                <button
+                  className="w-full text-left rounded-lg border border-base-300 bg-base-100 hover:bg-base-200 transition p-3 flex items-start gap-3"
+                  onClick={() => onAdd?.(item.kind)}
+                >
+                  <div className="mt-0.5">{item.icon}</div>
+                  <div>
+                    <div className="font-medium">{item.label}</div>
+                    {item.description && <div className="text-xs text-base-content/70 mt-0.5">{item.description}</div>}
                   </div>
-                )}
+                </button>
               </li>
             ))}
           </ul>
@@ -77,19 +80,26 @@ export const SideBar = ({ onAdd }: SideBarProps) => {
       </details>
 
       <details className="collapse collapse-arrow bg-base-100 border border-base-300 rounded-box">
-        <summary className="collapse-title text-sm font-semibold flex items-center gap-2">
-          Actions
-          <span className="badge badge-sm">{filteredActions.length}</span>
+        <summary className="collapse-title text-base font-semibold flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            <Crosshair className="h-4 w-4" /> Actions
+            <span className="badge badge-sm">{filteredActions.length}</span>
+          </div>
         </summary>
         <div className="collapse-content">
-          <ul className="menu gap-1">
+          <ul className="menu gap-2 w-full">
             {filteredActions.map(item => (
               <li key={item.kind}>
-                <button className="btn btn-ghost btn-sm justify-start" onClick={() => onAdd?.(item.kind)}>
-                  {item.icon}
-                  <span className="font-medium">{item.label}</span>
+                <button
+                  className="w-full text-left rounded-lg border border-base-300 bg-base-100 hover:bg-base-200 transition p-3 flex items-start gap-3"
+                  onClick={() => onAdd?.(item.kind)}
+                >
+                  <div className="mt-0.5">{item.icon}</div>
+                  <div>
+                    <div className="font-medium">{item.label}</div>
+                    {item.description && <div className="text-xs text-base-content/70 mt-0.5">{item.description}</div>}
+                  </div>
                 </button>
-                {item.description && <p className="px-3 pb-2 text-xs text-base-content/70">{item.description}</p>}
               </li>
             ))}
           </ul>

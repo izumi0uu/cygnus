@@ -82,9 +82,9 @@ export default function WorkflowBuilder({ mode = "view" }: WorkflowBuilderProps)
   );
 
   return (
-    <div className="min-h-screen">
-      <div className="w-full max-w-[120rem] mx-auto">
-        <div className="relative h-[70vh] min-h-[520px] rounded-box border border-base-200 bg-base-100 overflow-hidden">
+    <div className="h-screen">
+      <div className="w-full max-w-[120rem] mx-auto h-full">
+        <div className="relative rounded-box border border-base-200 bg-base-100 overflow-hidden h-full">
           <div className="flex h-full">
             <SideBar onAdd={handleAddNode} />
             <div className="flex-1">
@@ -100,7 +100,7 @@ export default function WorkflowBuilder({ mode = "view" }: WorkflowBuilderProps)
                 <Controls />
                 <Background gap={16} size={1} />
                 {nodes.length === 0 && edges.length === 0 && (
-                  <Panel position="top-left" className="w-full pointer-events-none">
+                  <Panel className="w-full pointer-events-none">
                     <EmptyTipsCard />
                   </Panel>
                 )}
