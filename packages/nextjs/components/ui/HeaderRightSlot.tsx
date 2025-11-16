@@ -10,9 +10,9 @@ export default function HeaderRightSlot() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  if (!pathname) {
-    return null;
-  }
+  if (!pathname) return null;
+
+  if (pathname === "/") return null;
 
   if (controls) return <>{controls}</>;
 

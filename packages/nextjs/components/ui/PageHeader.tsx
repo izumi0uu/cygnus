@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Breadcrumb } from "~~/types/path";
@@ -27,11 +28,13 @@ export default function PageHeader({
 }: PageHeaderProps) {
   const pathname = usePathname();
 
-  const { breadcrumbs: autoBreadcrumbsValue } = React.useMemo(() => buildBreadcrumbs(pathname ?? "/"), [pathname]);
+  const { breadcrumbs: autoBreadcrumbsValue } = useMemo(() => buildBreadcrumbs(pathname ?? "/"), [pathname]);
 
   const breadcrumbs = breadcrumbsProp ?? (autoBreadcrumbs ? autoBreadcrumbsValue : undefined);
 
   const hasBreadcrumbs = breadcrumbs && breadcrumbs.length > 0;
+
+  if (pathname === "/") return null;
 
   return (
     <header
