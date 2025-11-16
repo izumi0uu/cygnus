@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useCallback, useEffect } from "react";
+import { WorkflowControls } from "./ControlButtons";
 import { EmptyTipsCard } from "./EmptyTipsCard";
 import { SideBar } from "./SideBar";
-import { WorkflowControls } from "./WorkflowControls";
 import {
   Background,
   type Connection,
