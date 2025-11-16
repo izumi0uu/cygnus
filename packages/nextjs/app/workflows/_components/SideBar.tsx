@@ -44,7 +44,7 @@ export const SideBar = ({ onAdd }: SideBarProps) => {
   const filteredActions = actionItems.filter(i => i.label.toLowerCase().includes(q) || i.kind.includes(q));
 
   return (
-    <aside className="w-72 bg-base-200 border-r border-base-300 p-4 flex-shrink-0 space-y-3">
+    <aside className="bg-base-200 border-r border-base-300 p-4 flex-shrink-0 space-y-3">
       <input
         value={query}
         onChange={e => setQuery(e.target.value)}
