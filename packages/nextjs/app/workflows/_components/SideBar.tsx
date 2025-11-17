@@ -38,6 +38,14 @@ const actionItems: NodePaletteItem[] = [
 
 export const SideBar = ({ onAdd }: SideBarProps) => {
   const [query, setQuery] = React.useState("");
+  const handleDragStart = (e: React.DragEvent, item: NodePaletteItem) => {
+    try {
+      e.dataTransfer.setData("application/reactflow", JSON.stringify({ kind: item.kind }));
+      e.dataTransfer.effectAllowed = "move";
+    } catch {
+      // ignore
+    }
+  };
   const q = query.trim().toLowerCase();
   const filteredTriggers = triggerItems.filter(i => i.label.toLowerCase().includes(q) || i.kind.includes(q));
   const filteredActions = actionItems.filter(i => i.label.toLowerCase().includes(q) || i.kind.includes(q));
@@ -66,6 +74,8 @@ export const SideBar = ({ onAdd }: SideBarProps) => {
                 <button
                   className="w-full text-left rounded-lg border border-base-300 bg-base-100 hover:bg-base-200 transition p-3 flex items-start gap-3"
                   onClick={() => onAdd?.(item.kind)}
+                  draggable
+                  onDragStart={e => handleDragStart(e, item)}
                 >
                   <div className="mt-0.5">{item.icon}</div>
                   <div>
@@ -93,6 +103,8 @@ export const SideBar = ({ onAdd }: SideBarProps) => {
                 <button
                   className="w-full text-left rounded-lg border border-base-300 bg-base-100 hover:bg-base-200 transition p-3 flex items-start gap-3"
                   onClick={() => onAdd?.(item.kind)}
+                  draggable
+                  onDragStart={e => handleDragStart(e, item)}
                 >
                   <div className="mt-0.5">{item.icon}</div>
                   <div>

@@ -120,3 +120,11 @@
 .link:hover {
   opacity: 80%;
 }
+
+/* React Flow node state styles (type-based) */
+/* When a ReactFlow node is being dragged or is selected, style its inner card (.rf-node) identically */
+.react-flow__node.dragging > .rf-node,
+.react-flow__node.selected > .rf-node {
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+  border-color: hsl(var(--p));
+}

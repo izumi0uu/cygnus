@@ -56,9 +56,9 @@ const WorkflowNode = ({
 }: WorkflowNodeProps) => {
   return (
     <div
-      className={`pointer-events-auto w-64 rounded-2xl border border-base-300/70 bg-base-100 shadow-sm transition hover:shadow-lg ${className}`}
+      className={`rf-node pointer-events-auto w-64 rounded-2xl border border-base-300/70 bg-base-100 shadow-sm transition hover:shadow-lg ${className}`}
     >
-      <div className="flex items-start gap-3 border-b border-base-200 px-4 py-3">
+      <div className="rf-drag-handle flex items-start gap-3 border-b border-base-200 px-4 py-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-base-200 bg-base-200/60 text-lg">
           {icon ?? "⚙️"}
         </div>

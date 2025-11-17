@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useCallback, useEffect } from "react";
+import { WorkflowFlowContext } from "../_context/WorkflowFlowContext";
 import { WorkflowControls } from "./ControlButtons";
 import { EmptyTipsCard } from "./EmptyTipsCard";
 import { SideBar } from "./SideBar";
+import TimeTriggerNode from "./nodes/TimeTriggerNode";
 import {
   Background,
   type Connection,
@@ -11,12 +13,15 @@ import {
   type Edge,
   MiniMap,
   type Node,
+  Panel,
   ReactFlow,
+  ReactFlowProvider,
   addEdge,
   useEdgesState,
   useNodesState,
+  useReactFlow,
 } from "@xyflow/react";
-import { Panel } from "@xyflow/react";
+import type { NodeTypes } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useTopControls } from "~~/components/providers/TopControlsProvider";
 
@@ -28,18 +33,99 @@ const initialNodes: Node[] = [];
 
 const initialEdges: Edge[] = [];
 
-export default function WorkflowBuilder({ mode = "view" }: WorkflowBuilderProps) {
+const nodeTypes: NodeTypes = { time: TimeTriggerNode };
+
+const WorkflowFlow = ({ mode }: WorkflowBuilderProps) => {
   const isCreate = mode === "create";
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const { setControls, clearControls } = useTopControls();
+  const { screenToFlowPosition } = useReactFlow();
 
   const onConnect = useCallback((connection: Connection) => setEdges(eds => addEdge(connection, eds)), [setEdges]);
+  const onDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  }, []);
+
+  const onDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      try {
+        const raw = e.dataTransfer.getData("application/reactflow");
+        if (!raw) return;
+        const payload = JSON.parse(raw) as { kind?: string };
+        const kind = payload?.kind;
+        if (!kind) return;
+        const id = `${kind}-${Date.now()}`;
+        // project screen coords to flow coords (handles zoom/pan automatically)
+        const position = screenToFlowPosition({
+          x: e.clientX,
+          y: e.clientY,
+        });
+        const base: Partial<Node> = {};
+        const labelMap: Record<string, string> = {
+          time: "Time Trigger",
+          "webhook-trigger": "Webhook",
+          http: "HTTP Request",
+          db: "Database",
+          notify: "Notification",
+          message: "Message",
+        };
+        const typeMap: Record<string, Node["type"]> = { time: "time" };
+        setNodes(ns => [
+          ...ns,
+          {
+            id,
+            position,
+            type: typeMap[kind],
+            data: { label: labelMap[kind] ?? kind },
+            dragHandle: ".rf-drag-handle",
+            ...base,
+          } as any,
+        ]);
+      } catch {
+        // ignore
+      }
+    },
+    [setNodes, screenToFlowPosition],
+  );
+
+  const handleAddNode = useCallback(
+    (kind: string) => {
+      if (!isCreate) return;
+      const id = `${kind}-${Date.now()}`;
+      const base = { x: 220, y: 180 };
+      const labelMap: Record<string, string> = {
+        time: "Time Trigger",
+        "webhook-trigger": "Webhook",
+        http: "HTTP Request",
+        db: "Database",
+        notify: "Notification",
+        message: "Message",
+      };
+
+      const typeMap: Record<string, Node["type"]> = { time: "time" };
+
+      setNodes(ns => [
+        ...ns,
+        {
+          id,
+          position: base,
+          type: typeMap[kind],
+          data: { label: labelMap[kind] ?? kind },
+          dragHandle: ".rf-drag-handle",
+        },
+      ]);
+    },
+    [isCreate, setNodes],
+  );
 
   const handleReset = useCallback(() => {
     setNodes(initialNodes);
     setEdges(initialEdges);
   }, [setNodes, setEdges]);
+
+  const { setControls, clearControls } = useTopControls();
 
   const handleTest = useCallback(() => {
     // placeholder for future simulator integration
@@ -56,59 +142,49 @@ export default function WorkflowBuilder({ mode = "view" }: WorkflowBuilderProps)
     };
   }, [setControls, clearControls, isCreate, handleTest, handleReset, handleSave]);
 
-  const handleAddNode = useCallback(
-    (kind: string) => {
-      if (!isCreate) return;
-      const id = `${kind}-${Date.now()}`;
-      const base = { x: 220, y: 180 };
-      const labelMap: Record<string, string> = {
-        time: "Time Trigger",
-        "webhook-trigger": "Webhook",
-        http: "HTTP Request",
-        db: "Database",
-        notify: "Notification",
-        message: "Message",
-      };
-      setNodes(ns => [
-        ...ns,
-        {
-          id,
-          position: base,
-          data: { label: labelMap[kind] ?? kind },
-        },
-      ]);
-    },
-    [isCreate, setNodes],
+  return (
+    <WorkflowFlowContext.Provider value={{ handleReset }}>
+      <div className="flex h-full">
+        <SideBar onAdd={handleAddNode} />
+        <div className="flex-1">
+          <ReactFlow
+            nodeTypes={nodeTypes}
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={isCreate ? onConnect : undefined}
+            onDragOver={onDragOver}
+            onDrop={onDrop}
+            fitView
+          >
+            <MiniMap />
+            <Controls />
+            <Background gap={16} size={1} />
+            {nodes.length === 0 && edges.length === 0 && (
+              <Panel className="w-full pointer-events-none">
+                <EmptyTipsCard />
+              </Panel>
+            )}
+          </ReactFlow>
+        </div>
+      </div>
+    </WorkflowFlowContext.Provider>
   );
+};
 
+const WorkflowBuilder = ({ mode = "view" }: WorkflowBuilderProps) => {
   return (
     <div className="h-screen">
       <div className="w-full max-w-[120rem] mx-auto h-full">
         <div className="relative rounded-box border border-base-200 bg-base-100 overflow-hidden h-full">
-          <div className="flex h-full">
-            <SideBar onAdd={handleAddNode} />
-            <div className="flex-1">
-              <ReactFlow
-                nodes={nodes}
-                edges={edges}
-                onNodesChange={onNodesChange}
-                onEdgesChange={onEdgesChange}
-                onConnect={isCreate ? onConnect : undefined}
-                fitView
-              >
-                <MiniMap />
-                <Controls />
-                <Background gap={16} size={1} />
-                {nodes.length === 0 && edges.length === 0 && (
-                  <Panel className="w-full pointer-events-none">
-                    <EmptyTipsCard />
-                  </Panel>
-                )}
-              </ReactFlow>
-            </div>
-          </div>
+          <ReactFlowProvider>
+            <WorkflowFlow mode={mode} />
+          </ReactFlowProvider>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default WorkflowBuilder;
