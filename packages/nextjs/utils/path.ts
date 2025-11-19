@@ -1,4 +1,4 @@
-import { PATH_LABELS, SEGMENT_LABELS } from "~~/contants/path";
+import { PATH_LABELS, SEGMENT_LABELS } from "~~/constants/path";
 import type { Breadcrumb } from "~~/types/path";
 
 const toTitleCase = (value: string) =>
