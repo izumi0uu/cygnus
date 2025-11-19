@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Suspense } from "react";
 import "@rainbow-me/rainbowkit/styles.css";
 import "@scaffold-ui/components/styles.css";
 import { Providers } from "~~/components/providers/Providers";
@@ -29,7 +30,11 @@ const ScaffoldEthApp = ({ children }: { children: ReactNode }) => {
                   autoBreadcrumbs
                   className="border-b-0"
                   containerClassName="max-w-none px-6 mx-0"
-                  rightSlot={<HeaderRightSlot />}
+                  rightSlot={
+                    <Suspense fallback={null}>
+                      <HeaderRightSlot />
+                    </Suspense>
+                  }
                 />
                 <main className="flex-1 overflow-y-auto px-6 py-6">{children}</main>
               </div>

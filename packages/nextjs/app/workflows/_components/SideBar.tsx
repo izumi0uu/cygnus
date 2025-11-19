@@ -61,7 +61,7 @@ export const SideBar = ({ onAdd }: SideBarProps) => {
 
       <details open className="collapse collapse-arrow bg-base-100 border border-base-300 rounded-box">
         <summary className="collapse-title text-base font-semibold flex items-center gap-2">
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 mt-0.5">
             <Zap className="h-4 w-4" />
             Triggers
             <span className="badge badge-sm">{filteredTriggers.length}</span>
@@ -91,7 +91,7 @@ export const SideBar = ({ onAdd }: SideBarProps) => {
 
       <details className="collapse collapse-arrow bg-base-100 border border-base-300 rounded-box">
         <summary className="collapse-title text-base font-semibold flex items-center gap-2">
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 mt-0.5">
             <Crosshair className="h-4 w-4" /> Actions
             <span className="badge badge-sm">{filteredActions.length}</span>
           </div>

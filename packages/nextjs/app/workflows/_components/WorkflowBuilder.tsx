@@ -39,7 +39,16 @@ const WorkflowFlow = ({ mode }: WorkflowBuilderProps) => {
   const isCreate = mode === "create";
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const { screenToFlowPosition } = useReactFlow();
+  const { screenToFlowPosition, fitView } = useReactFlow();
+
+  useEffect(() => {
+    if (nodes.length === 0) {
+      const timer = setTimeout(() => {
+        fitView({ padding: 0.2, maxZoom: 1 });
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onConnect = useCallback((connection: Connection) => setEdges(eds => addEdge(connection, eds)), [setEdges]);
   const onDragOver = useCallback((e: React.DragEvent) => {
@@ -72,16 +81,18 @@ const WorkflowFlow = ({ mode }: WorkflowBuilderProps) => {
           message: "Message",
         };
         const typeMap: Record<string, Node["type"]> = { time: "time" };
+        const nodeType = typeMap[kind];
+
         setNodes(ns => [
           ...ns,
           {
             id,
             position,
-            type: typeMap[kind],
+            ...(nodeType ? { type: nodeType } : {}),
             data: { label: labelMap[kind] ?? kind },
-            dragHandle: ".rf-drag-handle",
+            ...(nodeType ? { dragHandle: ".rf-drag-handle" } : { draggable: true }),
             ...base,
-          } as any,
+          },
         ]);
       } catch {
         // ignore
@@ -105,15 +116,16 @@ const WorkflowFlow = ({ mode }: WorkflowBuilderProps) => {
       };
 
       const typeMap: Record<string, Node["type"]> = { time: "time" };
+      const nodeType = typeMap[kind];
 
       setNodes(ns => [
         ...ns,
         {
           id,
           position: base,
-          type: typeMap[kind],
+          ...(nodeType ? { type: nodeType } : {}),
           data: { label: labelMap[kind] ?? kind },
-          dragHandle: ".rf-drag-handle",
+          ...(nodeType ? { dragHandle: ".rf-drag-handle" } : { draggable: true }),
         },
       ]);
     },
@@ -156,7 +168,7 @@ const WorkflowFlow = ({ mode }: WorkflowBuilderProps) => {
             onConnect={isCreate ? onConnect : undefined}
             onDragOver={onDragOver}
             onDrop={onDrop}
-            fitView
+            nodesDraggable={isCreate}
           >
             <MiniMap />
             <Controls />
