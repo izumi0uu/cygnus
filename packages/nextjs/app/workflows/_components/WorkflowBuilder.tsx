@@ -2,15 +2,15 @@
 
 import React, { useCallback, useEffect } from "react";
 import { WorkflowFlowContext } from "../_context/WorkflowFlowContext";
+import { type NodeConfiguration, useNodeDrawerStore } from "../_store/nodeDrawerStore";
 import { WorkflowControls } from "./ControlButtons";
+import Drawer from "./Drawer";
 import { EmptyTipsCard } from "./EmptyTipsCard";
 import { SideBar } from "./SideBar";
-import TimeTriggerNode from "./nodes/TimeTriggerNode";
 import {
   Background,
   type Connection,
   Controls,
-  type Edge,
   MiniMap,
   type Node,
   Panel,
@@ -21,25 +21,30 @@ import {
   useNodesState,
   useReactFlow,
 } from "@xyflow/react";
-import type { NodeTypes } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useTopControls } from "~~/components/providers/TopControlsProvider";
+import {
+  type AssetType,
+  DEFAULT_NODE_CONFIGURATION,
+  INITIAL_EDGES,
+  INITIAL_NODES,
+  NODE_DEFAULT_POSITION,
+  NODE_LABEL_MAP,
+  NODE_TYPES,
+  NODE_TYPE_MAP,
+  type ScheduleType,
+} from "~~/constants/node";
 
 export type WorkflowBuilderProps = {
   mode?: "view" | "create" | "edit";
 };
 
-const initialNodes: Node[] = [];
-
-const initialEdges: Edge[] = [];
-
-const nodeTypes: NodeTypes = { time: TimeTriggerNode };
-
 const WorkflowFlow = ({ mode }: WorkflowBuilderProps) => {
   const isCreate = mode === "create";
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState(INITIAL_NODES);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(INITIAL_EDGES);
   const { screenToFlowPosition, fitView } = useReactFlow();
+  const { openDrawer, closeDrawer, setSaveCallback } = useNodeDrawerStore();
 
   useEffect(() => {
     if (nodes.length === 0) {
@@ -72,16 +77,7 @@ const WorkflowFlow = ({ mode }: WorkflowBuilderProps) => {
           y: e.clientY,
         });
         const base: Partial<Node> = {};
-        const labelMap: Record<string, string> = {
-          time: "Time Trigger",
-          "webhook-trigger": "Webhook",
-          http: "HTTP Request",
-          db: "Database",
-          notify: "Notification",
-          message: "Message",
-        };
-        const typeMap: Record<string, Node["type"]> = { time: "time" };
-        const nodeType = typeMap[kind];
+        const nodeType = NODE_TYPE_MAP[kind];
 
         setNodes(ns => [
           ...ns,
@@ -89,7 +85,7 @@ const WorkflowFlow = ({ mode }: WorkflowBuilderProps) => {
             id,
             position,
             ...(nodeType ? { type: nodeType } : {}),
-            data: { label: labelMap[kind] ?? kind },
+            data: { label: NODE_LABEL_MAP[kind] ?? kind },
             ...(nodeType ? { dragHandle: ".rf-drag-handle" } : { draggable: true }),
             ...base,
           },
@@ -105,26 +101,15 @@ const WorkflowFlow = ({ mode }: WorkflowBuilderProps) => {
     (kind: string) => {
       if (!isCreate) return;
       const id = `${kind}-${Date.now()}`;
-      const base = { x: 220, y: 180 };
-      const labelMap: Record<string, string> = {
-        time: "Time Trigger",
-        "webhook-trigger": "Webhook",
-        http: "HTTP Request",
-        db: "Database",
-        notify: "Notification",
-        message: "Message",
-      };
-
-      const typeMap: Record<string, Node["type"]> = { time: "time" };
-      const nodeType = typeMap[kind];
+      const nodeType = NODE_TYPE_MAP[kind];
 
       setNodes(ns => [
         ...ns,
         {
           id,
-          position: base,
+          position: NODE_DEFAULT_POSITION,
           ...(nodeType ? { type: nodeType } : {}),
-          data: { label: labelMap[kind] ?? kind },
+          data: { label: NODE_LABEL_MAP[kind] ?? kind },
           ...(nodeType ? { dragHandle: ".rf-drag-handle" } : { draggable: true }),
         },
       ]);
@@ -133,9 +118,49 @@ const WorkflowFlow = ({ mode }: WorkflowBuilderProps) => {
   );
 
   const handleReset = useCallback(() => {
-    setNodes(initialNodes);
-    setEdges(initialEdges);
+    setNodes(INITIAL_NODES);
+    setEdges(INITIAL_EDGES);
   }, [setNodes, setEdges]);
+
+  const onNodeClick = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      // Determine node type based on node.type or data
+      const nodeType: "trigger" | "action" = node.type === "time" ? "trigger" : "action";
+
+      // Extract configuration from node data
+      const nodeData = node.data as any;
+      const config = {
+        asset: (nodeData.asset as AssetType) || DEFAULT_NODE_CONFIGURATION.asset,
+        priceThreshold: nodeData.priceThreshold || DEFAULT_NODE_CONFIGURATION.priceThreshold,
+        time: nodeData.time,
+        schedule: nodeData.schedule as ScheduleType | undefined,
+      };
+
+      // Extract debug info
+      const debugInfo = {
+        nodeId: node.id,
+        position: node.position,
+        type: node.type,
+        selected: node.selected,
+        ...(nodeData.debugInfo || {}),
+      };
+
+      openDrawer(
+        {
+          nodeId: node.id,
+          name: nodeData.label || node.id,
+          type: nodeType,
+        },
+        config,
+        debugInfo,
+      );
+    },
+    [openDrawer],
+  );
+
+  const onPaneClick = useCallback(() => {
+    closeDrawer();
+  }, [closeDrawer]);
 
   const { setControls, clearControls } = useTopControls();
 
@@ -154,13 +179,42 @@ const WorkflowFlow = ({ mode }: WorkflowBuilderProps) => {
     };
   }, [setControls, clearControls, isCreate, handleTest, handleReset, handleSave]);
 
+  // Register save callback to update node data when configuration is saved
+  useEffect(() => {
+    const handleSaveConfiguration = (nodeId: string, config: NodeConfiguration) => {
+      setNodes(ns =>
+        ns.map(node => {
+          if (node.id === nodeId) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                ...config,
+                asset: config.asset,
+                priceThreshold: config.priceThreshold,
+                time: config.time,
+                schedule: config.schedule,
+              },
+            };
+          }
+          return node;
+        }),
+      );
+    };
+
+    setSaveCallback(handleSaveConfiguration);
+    return () => {
+      setSaveCallback(null);
+    };
+  }, [setNodes, setSaveCallback]);
+
   return (
     <WorkflowFlowContext.Provider value={{ handleReset }}>
       <div className="flex h-full">
         <SideBar onAdd={handleAddNode} />
         <div className="flex-1">
           <ReactFlow
-            nodeTypes={nodeTypes}
+            nodeTypes={NODE_TYPES}
             nodes={nodes}
             edges={edges}
             onNodesChange={onNodesChange}
@@ -168,6 +222,8 @@ const WorkflowFlow = ({ mode }: WorkflowBuilderProps) => {
             onConnect={isCreate ? onConnect : undefined}
             onDragOver={onDragOver}
             onDrop={onDrop}
+            onNodeClick={onNodeClick}
+            onPaneClick={onPaneClick}
             nodesDraggable={isCreate}
           >
             <MiniMap />
@@ -180,6 +236,7 @@ const WorkflowFlow = ({ mode }: WorkflowBuilderProps) => {
             )}
           </ReactFlow>
         </div>
+        <Drawer />
       </div>
     </WorkflowFlowContext.Provider>
   );
