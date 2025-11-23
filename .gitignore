@@ -1,6 +1,9 @@
 # dependencies
 node_modules
 
+# lockfiles (use yarn only)
+package-lock.json
+
 # yarn
 .yarn/*
 !.yarn/patches
