@@ -1,36 +1,70 @@
 "use client";
 
-import React from "react";
-import { type AssetType, useNodeDrawerStore } from "../_store/nodeDrawerStore";
+import React, { useMemo, useState } from "react";
+import { useNodeDrawerStore } from "../_store/nodeDrawerStore";
+import type { DrawerPluginRegistry } from "./drawer/plugin.types";
+import { defaultPluginRegistry, getEnabledPlugins } from "./drawer/plugins";
 import { X } from "lucide-react";
-import { type ScheduleType } from "~~/constants/node";
 
-export default function Drawer() {
+export interface DrawerProps {
+  /** Custom plugin registry. If not provided, uses default registry */
+  pluginRegistry?: DrawerPluginRegistry;
+}
+
+export default function Drawer({ pluginRegistry = defaultPluginRegistry }: DrawerProps) {
   const { isOpen, currentNode, configuration, debugInfo, closeDrawer, updateConfiguration, saveConfiguration } =
     useNodeDrawerStore();
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
-  const handleSave = () => {
+  // Get enabled plugins for current node
+  const enabledPlugins = useMemo(() => {
+    if (!currentNode) return [];
+    return getEnabledPlugins(pluginRegistry, currentNode, configuration);
+  }, [currentNode, configuration, pluginRegistry]);
+
+  const handleSave = async () => {
+    // Validate all plugins before saving
+    if (currentNode) {
+      const errors: Record<string, string> = {};
+      enabledPlugins.forEach(plugin => {
+        if (plugin.validate) {
+          const pluginValue = (configuration as Record<string, any>)[plugin.key] ?? plugin.defaultValue;
+          const error = plugin.validate(pluginValue, configuration);
+          if (error) {
+            errors[plugin.key] = error;
+          }
+        }
+      });
+
+      if (Object.keys(errors).length > 0) {
+        setValidationErrors(errors);
+        return;
+      }
+
+      setValidationErrors({});
+
+      // Call onSave for each enabled plugin that has it
+      const savePromises = enabledPlugins
+        .filter(plugin => plugin.onSave)
+        .map(plugin => {
+          const pluginValue = (configuration as Record<string, any>)[plugin.key] ?? plugin.defaultValue;
+          return plugin.onSave!(pluginValue, currentNode, configuration);
+        });
+
+      try {
+        await Promise.all(savePromises);
+      } catch (error) {
+        console.error("Error saving plugin configurations:", error);
+        // Continue with normal save even if plugin saves fail
+      }
+    }
+
+    // Save configuration to store (which will trigger the callback)
     saveConfiguration();
     closeDrawer();
   };
 
   if (!isOpen || !currentNode) return null;
-
-  const handleAssetChange = (asset: AssetType) => {
-    updateConfiguration({ asset });
-  };
-
-  const handlePriceThresholdChange = (value: string) => {
-    updateConfiguration({ priceThreshold: value });
-  };
-
-  const handleTimeChange = (time: string) => {
-    updateConfiguration({ time });
-  };
-
-  const handleScheduleChange = (schedule: ScheduleType) => {
-    updateConfiguration({ schedule });
-  };
 
   return (
     <div
@@ -52,7 +86,7 @@ export default function Drawer() {
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
-          {/* Node Information */}
+          {/* Node Information - Always shown for all nodes */}
           <section>
             <h3 className="text-sm font-semibold text-base-content mb-3">Node Information</h3>
             <div className="space-y-2">
@@ -71,76 +105,43 @@ export default function Drawer() {
             </div>
           </section>
 
-          {/* Configuration */}
-          <section>
-            <h3 className="text-sm font-semibold text-base-content mb-3">Configuration</h3>
-            <div className="space-y-4">
-              {/* Asset Select */}
-              <div>
-                <label className="label">
-                  <span className="label-text text-sm font-medium">Asset</span>
-                </label>
-                <select
-                  className="select select-bordered w-full"
-                  value={configuration.asset}
-                  onChange={e => handleAssetChange(e.target.value as AssetType)}
-                >
-                  <option value="eth">ETH</option>
-                  <option value="btc">BTC</option>
-                  <option value="sol">SOL</option>
-                  <option value="avalanche">Avalanche</option>
-                </select>
+          {/* Configuration - Dynamically rendered based on enabled plugins */}
+          {enabledPlugins.length > 0 && (
+            <section>
+              <h3 className="text-sm font-semibold text-base-content mb-3">Configuration</h3>
+              <div className="space-y-4">
+                {enabledPlugins.map(plugin => {
+                  const pluginValue = (configuration as Record<string, any>)[plugin.key] ?? plugin.defaultValue;
+                  const handlePluginChange = (value: any) => {
+                    updateConfiguration({ [plugin.key]: value } as any);
+                    // Clear validation error when user changes value
+                    if (validationErrors[plugin.key]) {
+                      setValidationErrors(prev => {
+                        const next = { ...prev };
+                        delete next[plugin.key];
+                        return next;
+                      });
+                    }
+                  };
+
+                  return (
+                    <div key={plugin.key}>
+                      {plugin.render({
+                        value: pluginValue,
+                        config: configuration,
+                        onChange: handlePluginChange,
+                        node: currentNode,
+                        disabled: false,
+                        error: validationErrors[plugin.key],
+                      })}
+                    </div>
+                  );
+                })}
               </div>
+            </section>
+          )}
 
-              {/* Price Threshold */}
-              <div>
-                <label className="label">
-                  <span className="label-text text-sm font-medium">Price Threshold</span>
-                </label>
-                <input
-                  type="number"
-                  className="input input-bordered w-full"
-                  placeholder="Enter price threshold"
-                  value={configuration.priceThreshold}
-                  onChange={e => handlePriceThresholdChange(e.target.value)}
-                />
-              </div>
-
-              {/* TimeTrigger Specific Configuration */}
-              {currentNode.type === "trigger" && (
-                <>
-                  <div>
-                    <label className="label">
-                      <span className="label-text text-sm font-medium">Time</span>
-                    </label>
-                    <input
-                      type="time"
-                      className="input input-bordered w-full"
-                      value={configuration.time || "10:00"}
-                      onChange={e => handleTimeChange(e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="label">
-                      <span className="label-text text-sm font-medium">Schedule</span>
-                    </label>
-                    <select
-                      className="select select-bordered w-full"
-                      value={configuration.schedule || "daily"}
-                      onChange={e => handleScheduleChange(e.target.value as ScheduleType)}
-                    >
-                      <option value="daily">Daily</option>
-                      <option value="weekly">Weekly</option>
-                      <option value="monthly">Monthly</option>
-                    </select>
-                  </div>
-                </>
-              )}
-            </div>
-          </section>
-
-          {/* Debug Information */}
+          {/* Debug Information - Always shown for all nodes */}
           <section>
             <h3 className="text-sm font-semibold text-base-content mb-3">Debug Information</h3>
             <div className="bg-base-200 rounded-lg p-4">
