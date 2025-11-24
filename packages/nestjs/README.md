@@ -4,13 +4,46 @@ This is the NestJS backend service for the Cygnus monorepo.
 
 ## Getting Started
 
-### Installation
+### Prerequisites
 
-Install dependencies from the root of the monorepo:
+Before starting, ensure you have installed:
+
+- **Node.js** >= 20.18.3
+- **PostgreSQL** (for database)
+- **Redis** (for BullMQ message queue)
+
+See [SETUP.md](./docs/SETUP.md) for detailed installation instructions.
+
+### Quick Start
+
+1. **Install dependencies** from the root of the monorepo:
 
 ```bash
 yarn install
 ```
+
+2. **Configure environment variables**:
+
+```bash
+cd packages/nestjs
+cp env.example .env
+# Edit .env with your database and Redis credentials
+```
+
+3. **Start the development server**:
+
+```bash
+yarn start:dev
+```
+
+The server will start on `http://localhost:3000` by default.
+
+### Environment Setup
+
+For detailed environment configuration, see:
+
+- [SETUP.md](./docs/SETUP.md) - Complete setup guide
+- [ENVIRONMENT.md](./docs/ENVIRONMENT.md) - Environment variables reference
 
 ### Development
 
