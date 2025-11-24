@@ -1,0 +1,20 @@
+{
+  "name": "@cygnus/database",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w"
+  },
+  "dependencies": {
+    "typeorm": "^0.3.27"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

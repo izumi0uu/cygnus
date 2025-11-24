@@ -1,6 +1,6 @@
-# Cygnus NestJS Backend - Environment Setup Guide
+# Cygnus API Service - Environment Setup Guide
 
-This guide will walk you through setting up the environment for the Cygnus NestJS backend project.
+This guide will walk you through setting up the environment for the Cygnus API Service.
 
 ## 1. Environment Preparation
 
@@ -117,7 +117,7 @@ redis-cli ping
 1. **Copy environment variable template:**
 
    ```bash
-   cd packages/nestjs
+   cd apps/api
    cp env.example .env
    ```
 
@@ -199,7 +199,11 @@ After environment preparation is complete, you can:
 1. **Start the development server:**
 
    ```bash
-   cd packages/nestjs
+   # From root directory
+   yarn api:dev
+
+   # Or from apps/api directory
+   cd apps/api
    yarn start:dev
    ```
 

@@ -1,6 +1,6 @@
-# NestJS Backend
+# Cygnus API Service
 
-This is the NestJS backend service for the Cygnus monorepo.
+This is the API Service for the Cygnus monorepo, built with NestJS.
 
 ## Getting Started
 
@@ -25,7 +25,7 @@ yarn install
 2. **Configure environment variables**:
 
 ```bash
-cd packages/nestjs
+cd apps/api
 cp env.example .env
 # Edit .env with your database and Redis credentials
 ```
@@ -33,10 +33,14 @@ cp env.example .env
 3. **Start the development server**:
 
 ```bash
+# From root directory
+yarn api:dev
+
+# Or from apps/api directory
 yarn start:dev
 ```
 
-The server will start on `http://localhost:3000` by default.
+The server will start on `http://localhost:3000` by default (configurable via `PORT` environment variable).
 
 ### Environment Setup
 
@@ -50,20 +54,20 @@ For detailed environment configuration, see:
 Start the development server:
 
 ```bash
-# From root
-yarn nestjs:start:dev
+# From root directory
+yarn api:dev
 
 # Or from this directory
 yarn start:dev
 ```
 
-The server will start on `http://localhost:3000` by default.
+The server will start on `http://localhost:3000` by default (configurable via `PORT` environment variable).
 
 ### Available Scripts
 
 - `yarn build` - Build the application
 - `yarn start` - Start the production server
-- `yarn start:dev` - Start the development server with hot reload
+- `yarn start:dev` / `yarn dev` - Start the development server with hot reload
 - `yarn start:debug` - Start the server in debug mode
 - `yarn start:prod` - Start the production server
 - `yarn lint` - Run ESLint
@@ -72,6 +76,8 @@ The server will start on `http://localhost:3000` by default.
 - `yarn test:e2e` - Run end-to-end tests
 - `yarn test:cov` - Run tests with coverage
 - `yarn check-types` - Check TypeScript types
+- `yarn migration:generate` - Generate a new database migration
+- `yarn migration:run` - Run pending database migrations
 
 ### Project Structure
 
@@ -86,7 +92,7 @@ src/
 ### API Endpoints
 
 - `GET /` - Returns "Hello from NestJS!"
-- `GET /health` - Health check endpoint
+- `GET /health` - Health check endpoint (returns service status and timestamp)
 
 ### Environment Variables
 
@@ -109,4 +115,16 @@ yarn test:e2e
 
 ### Integration with Frontend
 
-The NestJS backend is configured to allow CORS requests from the Next.js frontend running on port 4321. You can configure this in `src/main.ts`.
+The API service is configured to allow CORS requests from the Next.js frontend running on port 4321. You can configure this via the `FRONTEND_URL` environment variable or in `src/main.ts`.
+
+### Database Migrations
+
+Run database migrations:
+
+```bash
+# From root directory
+yarn api:migration:run
+
+# Or from apps/api directory
+yarn migration:run
+```

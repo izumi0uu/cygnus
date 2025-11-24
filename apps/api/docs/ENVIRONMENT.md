@@ -1,6 +1,6 @@
 # Environment Configuration Guide
 
-This document explains how to configure environment variables for the Cygnus NestJS backend.
+This document explains how to configure environment variables for the Cygnus API Service.
 
 ## Quick Start
 
@@ -138,7 +138,7 @@ Should return:
 {
   "status": "ok",
   "timestamp": "2024-...",
-  "service": "nestjs"
+  "service": "api"
 }
 ```
 
