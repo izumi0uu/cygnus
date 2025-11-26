@@ -1439,6 +1439,7 @@ __metadata:
   resolution: "@cygnus/api@workspace:apps/api"
   dependencies:
     "@alchemy/aa-core": ^3.19.0
+    "@cygnus/database": "workspace:*"
     "@eslint/eslintrc": ^3.2.0
     "@eslint/js": ^9.18.0
     "@langchain/core": ^0.3.78
@@ -1496,7 +1497,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cygnus/database@workspace:packages/database":
+"@cygnus/database@workspace:*, @cygnus/database@workspace:packages/database":
   version: 0.0.0-use.local
   resolution: "@cygnus/database@workspace:packages/database"
   dependencies:

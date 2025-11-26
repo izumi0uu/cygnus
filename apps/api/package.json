@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@alchemy/aa-core": "^3.19.0",
+    "@cygnus/database": "workspace:*",
     "@langchain/core": "^0.3.78",
     "@langchain/openai": "^0.6.14",
     "@lifi/sdk": "^3.12.14",

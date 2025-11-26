@@ -10,6 +10,11 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "composite": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@cygnus/database": ["packages/database/src/index"],
+      "@cygnus/database/*": ["packages/database/src/*"]
+    }
   }
 }
