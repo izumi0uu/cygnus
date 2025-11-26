@@ -13,8 +13,8 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@cygnus/database": ["packages/database/src/index"],
-      "@cygnus/database/*": ["packages/database/src/*"]
+      "@cygnus/database": ["packages/database/dist/index"],
+      "@cygnus/database/*": ["packages/database/dist/*"]
     }
   }
 }

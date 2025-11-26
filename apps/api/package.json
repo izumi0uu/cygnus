@@ -6,6 +6,8 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "prebuild": "yarn workspace @cygnus/database build",
+    "predev": "yarn workspace @cygnus/database build",
     "dev": "nest start --watch",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
