@@ -1,4 +1,4 @@
-import { getMetadata } from "~~/utils/scaffold-eth/getMetadata";
+import { getMetadata } from "~~/utils/on-chain/getMetadata";
 
 export const metadata = getMetadata({
   title: "Block Explorer",

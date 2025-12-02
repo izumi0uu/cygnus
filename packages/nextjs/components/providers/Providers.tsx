@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { PrivyProvider } from "@privy-io/react-auth";
 import { RainbowKitProvider, darkTheme, lightTheme } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
@@ -8,8 +9,8 @@ import { useTheme } from "next-themes";
 import { Toaster } from "react-hot-toast";
 import { WagmiProvider } from "wagmi";
 import { ThemeProvider } from "~~/components/ThemeProvider";
+import { BlockieAvatar } from "~~/components/on-chain";
 import { TopControlsProvider } from "~~/components/providers/TopControlsProvider";
-import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 
 export const queryClient = new QueryClient({
@@ -29,22 +30,41 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
     setMounted(true);
   }, []);
 
+  const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID;
+
   return (
     <ThemeProvider enableSystem>
-      <WagmiProvider config={wagmiConfig}>
-        <QueryClientProvider client={queryClient}>
-          <ProgressBar height="3px" color="#2299dd" />
-          <RainbowKitProvider
-            avatar={BlockieAvatar}
-            theme={mounted ? (isDarkMode ? darkTheme() : lightTheme()) : lightTheme()}
-          >
-            <TopControlsProvider>
-              {children}
-              <Toaster />
-            </TopControlsProvider>
-          </RainbowKitProvider>
-        </QueryClientProvider>
-      </WagmiProvider>
+      <PrivyProvider
+        appId={privyAppId || ""}
+        config={{
+          loginMethods: ["email", "wallet", "google", "twitter"],
+          appearance: {
+            theme: mounted ? (isDarkMode ? "dark" : "light") : "light",
+            accentColor: "#2299dd",
+            logo: "/logo.svg",
+          },
+          embeddedWallets: {
+            ethereum: {
+              createOnLogin: "users-without-wallets",
+            },
+          },
+        }}
+      >
+        <WagmiProvider config={wagmiConfig}>
+          <QueryClientProvider client={queryClient}>
+            <ProgressBar height="3px" color="#2299dd" />
+            <RainbowKitProvider
+              avatar={BlockieAvatar}
+              theme={mounted ? (isDarkMode ? darkTheme() : lightTheme()) : lightTheme()}
+            >
+              <TopControlsProvider>
+                {children}
+                <Toaster />
+              </TopControlsProvider>
+            </RainbowKitProvider>
+          </QueryClientProvider>
+        </WagmiProvider>
+      </PrivyProvider>
     </ThemeProvider>
   );
 };

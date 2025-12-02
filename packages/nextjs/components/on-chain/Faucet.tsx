@@ -6,8 +6,8 @@ import { Address as AddressType, createWalletClient, http, parseEther } from "vi
 import { hardhat } from "viem/chains";
 import { useAccount } from "wagmi";
 import { BanknotesIcon } from "@heroicons/react/24/outline";
-import { useTargetNetwork, useTransactor } from "~~/hooks/scaffold-eth";
-import { notification } from "~~/utils/scaffold-eth";
+import { useTargetNetwork, useTransactor } from "~~/hooks/on-chain";
+import { notification } from "~~/utils/on-chain";
 
 // Account index to use from generated hardhat accounts.
 const FAUCET_ACCOUNT_INDEX = 0;

@@ -9,7 +9,7 @@ import HeaderRightSlot from "~~/components/ui/HeaderRightSlot";
 import PageHeader from "~~/components/ui/PageHeader";
 import SideNav from "~~/components/ui/SideNav";
 import "~~/styles/globals.css";
-import { getMetadata } from "~~/utils/scaffold-eth/getMetadata";
+import { getMetadata } from "~~/utils/on-chain/getMetadata";
 
 export const metadata = getMetadata({
   title: "Workflows defi App",

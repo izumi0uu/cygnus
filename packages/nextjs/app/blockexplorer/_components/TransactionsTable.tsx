@@ -2,9 +2,9 @@ import { TransactionHash } from "./TransactionHash";
 import { Address } from "@scaffold-ui/components";
 import { formatEther } from "viem";
 import { hardhat } from "viem/chains";
-import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
-import { TransactionWithFunction } from "~~/utils/scaffold-eth";
-import { TransactionsTableProps } from "~~/utils/scaffold-eth/";
+import { useTargetNetwork } from "~~/hooks/on-chain/useTargetNetwork";
+import { TransactionWithFunction } from "~~/utils/on-chain";
+import { TransactionsTableProps } from "~~/utils/on-chain";
 
 export const TransactionsTable = ({ blocks, transactionReceipts }: TransactionsTableProps) => {
   const { targetNetwork } = useTargetNetwork();

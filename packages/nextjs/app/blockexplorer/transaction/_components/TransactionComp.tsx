@@ -6,9 +6,9 @@ import { Address } from "@scaffold-ui/components";
 import { Hash, Transaction, TransactionReceipt, formatEther, formatUnits } from "viem";
 import { hardhat } from "viem/chains";
 import { usePublicClient } from "wagmi";
-import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
-import { decodeTransactionData, getFunctionDetails } from "~~/utils/scaffold-eth";
-import { replacer } from "~~/utils/scaffold-eth/common";
+import { useTargetNetwork } from "~~/hooks/on-chain/useTargetNetwork";
+import { decodeTransactionData, getFunctionDetails } from "~~/utils/on-chain";
+import { replacer } from "~~/utils/on-chain/common";
 
 const TransactionComp = ({ txHash }: { txHash: Hash }) => {
   const client = usePublicClient({ chainId: hardhat.id });

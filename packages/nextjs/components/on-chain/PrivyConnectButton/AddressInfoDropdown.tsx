@@ -13,10 +13,10 @@ import {
   EyeIcon,
   QrCodeIcon,
 } from "@heroicons/react/24/outline";
-import { BlockieAvatar } from "~~/components/scaffold-eth";
-import { useCopyToClipboard, useOutsideClick } from "~~/hooks/scaffold-eth";
-import { getTargetNetworks } from "~~/utils/scaffold-eth";
-import { isENS } from "~~/utils/scaffold-eth/common";
+import { BlockieAvatar } from "~~/components/on-chain";
+import { useCopyToClipboard, useOutsideClick } from "~~/hooks/on-chain";
+import { getTargetNetworks } from "~~/utils/on-chain";
+import { isENS } from "~~/utils/on-chain/common";
 
 const BURNER_WALLET_ID = "burnerWallet";
 
@@ -27,6 +27,7 @@ type AddressInfoDropdownProps = {
   blockExplorerAddressLink: string | undefined;
   displayName: string;
   ensAvatar?: string;
+  onDisconnect?: () => void;
 };
 
 export const AddressInfoDropdown = ({
@@ -34,6 +35,7 @@ export const AddressInfoDropdown = ({
   ensAvatar,
   displayName,
   blockExplorerAddressLink,
+  onDisconnect,
 }: AddressInfoDropdownProps) => {
   const { disconnect } = useDisconnect();
   const { connector } = useAccount();
@@ -125,7 +127,10 @@ export const AddressInfoDropdown = ({
             <button
               className="menu-item text-error h-8 btn-sm rounded-xl! flex gap-3 py-3"
               type="button"
-              onClick={() => disconnect()}
+              onClick={() => {
+                if (onDisconnect) onDisconnect();
+                else disconnect();
+              }}
             >
               <ArrowLeftOnRectangleIcon className="h-6 w-4 ml-2 sm:ml-0" /> <span>Disconnect</span>
             </button>

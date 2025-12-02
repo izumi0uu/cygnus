@@ -6,8 +6,8 @@ import Link from "next/link";
 import { hardhat } from "viem/chains";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import { navigationLinks } from "~~/components/navigation/links";
-import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
-import { useOutsideClick, useTargetNetwork } from "~~/hooks/scaffold-eth";
+import { FaucetButton, PrivyConnectButton } from "~~/components/on-chain";
+import { useOutsideClick, useTargetNetwork } from "~~/hooks/on-chain";
 
 type HeaderMenuLink = {
   label: string;
@@ -48,7 +48,7 @@ export const Header = () => {
         </Link>
       </div>
       <div className="navbar-end grow mr-4">
-        <RainbowKitCustomConnectButton />
+        <PrivyConnectButton />
         {isLocalNetwork && <FaucetButton />}
       </div>
     </div>

@@ -1,10 +1,10 @@
 import { Abi, ExtractAbiEventNames } from "abitype";
 import { Log } from "viem";
 import { useWatchContractEvent } from "wagmi";
-import { useSelectedNetwork } from "~~/hooks/scaffold-eth";
-import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
-import { AllowedChainIds } from "~~/utils/scaffold-eth";
-import { ContractAbi, ContractName, UseScaffoldEventConfig } from "~~/utils/scaffold-eth/contract";
+import { useSelectedNetwork } from "~~/hooks/on-chain";
+import { useDeployedContractInfo } from "~~/hooks/on-chain";
+import { AllowedChainIds } from "~~/utils/on-chain";
+import { ContractAbi, ContractName, UseScaffoldEventConfig } from "~~/utils/on-chain/contract";
 
 /**
  * Wrapper around wagmi's useEventSubscriber hook which automatically loads (by name) the contract ABI and

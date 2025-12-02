@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import { useOutsideClick } from "~~/hooks/scaffold-eth";
+import { useOutsideClick } from "~~/hooks/on-chain";
 
 export interface DropdownSelectOption<T = string> {
   value: T;

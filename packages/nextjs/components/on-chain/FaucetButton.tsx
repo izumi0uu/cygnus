@@ -6,7 +6,7 @@ import { createWalletClient, http, parseEther } from "viem";
 import { hardhat } from "viem/chains";
 import { useAccount } from "wagmi";
 import { BanknotesIcon } from "@heroicons/react/24/outline";
-import { useTransactor } from "~~/hooks/scaffold-eth";
+import { useTransactor } from "~~/hooks/on-chain";
 
 // Number of ETH faucet sends to an address
 const NUM_OF_ETH = "1";
